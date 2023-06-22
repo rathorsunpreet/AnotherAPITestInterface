@@ -1,0 +1,22 @@
+{
+  "commands": {
+    "env": "dev",
+    "testdir": "",
+    "aloha": 123,
+    "test": "www.google.ca",
+    "site": 'yahoo.com',
+    "howdy": "idontknow",
+    "excludefiles": [
+      "single",
+      "multiple"
+    ],
+    "token": "asdkhaksf213uoiefewdjo2",
+    "runner": "jasmine"
+  },
+  "files": [
+    "users",
+    "registration"
+  ],
+  "shite": "pissbrain",
+  "numbers": 123
+}

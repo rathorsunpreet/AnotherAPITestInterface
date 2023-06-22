@@ -1,0 +1,22 @@
+{
+    "env": {
+        "commonjs": true,
+        "es2021": true,
+        "node": true
+    },
+    "extends": [
+      "airbnb-base",
+      "plugin:mocha/recommended"
+    ],
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+      "prefer-arrow-callback": "off",
+      "func-names": "off",
+      "no-console": "off"
+    },
+    "plugins": [
+        "mocha"
+    ]
+}

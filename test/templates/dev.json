@@ -1,0 +1,7 @@
+{
+  "commands": {
+    "env": "dev",
+    "testdir": "",
+    // comments
+  }
+}

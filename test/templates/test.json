@@ -1,0 +1,9 @@
+{
+  "commands": [
+    "asshole",
+    "shit"
+  ],
+  "env": "dev",
+  "testdir": "",
+  "files": "users"
+}
