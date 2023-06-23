@@ -2,4 +2,4 @@ const loader = require('./helpers/loader');
 
 loader.loadDefaults('./test/config/defaults.json');
 
-console.log(loader.getEnv());
+console.log(loader.getDefValue());

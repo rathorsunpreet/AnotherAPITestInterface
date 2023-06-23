@@ -1,0 +1,61 @@
+{
+  "id": "/defaultsSchema",
+  "type": "object",
+  "properties": {
+    "env": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "runner": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "commands": {
+      "type": "object",
+      "properties": {
+        "withValue": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 2,
+            "maxItems": 3
+          }
+        },
+        "withoutValue": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "minItems": 2,
+            "maxItems": 2
+          }
+        }
+      },
+      "required": ["withValue", "withoutValue"],
+    },
+    "sites": {
+      "type": "object",
+      "properties": {
+        "prod": {
+          "type": "string"
+        },
+        "dev": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string"
+        },
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -14,15 +14,15 @@
     // All three parameters are strings unless otherwise specified
     "withValue": [
       ["env", "Sets the environment to use", "test"],
-      ["site", "Sets the new site to use for the specified environment", ""],
-      ["token", "Set the Authorization Token to use for this run", ""],
-      ["excludefiles", "Removes the specified files from the available test suite list for this run", {}],
+      ["site", "Sets the new site to use for the specified environment"],
+      ["token", "Set the Authorization Token to use for this run"],
+      ["excludefiles", "Removes the specified files from the available test suite list for this run"],
       ["runner", "Sets which test runner to execute", "mocha"],
-      ["templatename", "Sets the name of the template to use", ""],
-      ["templatedir", "Sets the location of template's folder", "/test/templates/"],
-      ["testdir", "Sets the location of test suite folder", "/test/cases/mocha/"],
-      ["datafile", "Sets the location of the user data file to use in test cases", "/test/user_data/user_data.js"],
-      ["files", "Used inside template files, lists test suites to execute", []]
+      ["templatename", "Sets the name of the template to use"],
+      ["templatedir", "Sets the location of template's folder", "./test/templates/"],
+      ["testdir", "Sets the location of test suite folder", "./test/suites/mocha/"],
+      ["datafile", "Sets the location of the user data file to use in test cases", "./test/data/data.js"],
+      ["files", "Used inside template files, lists test suites to execute"]
     ],
     "withoutValue": [
       ["help", "Displays a help message"],
