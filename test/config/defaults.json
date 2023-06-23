@@ -25,10 +25,10 @@
       ["files", "Used inside template files, lists test suites to execute", []]
     ],
     "withoutValue": [
-      ["help", "Displays a help message", ""],
-      ["list", "Displays list of test suite file names", ""],
-      ["report", "Generates HTML reports after executing specified test suites", ""],
-      ["savetemplate", "Saves the command-line arguments for this run as a JSON template", ""]
+      ["help", "Displays a help message"],
+      ["list", "Displays list of test suite file names"],
+      ["report", "Generates HTML reports after executing specified test suites"],
+      ["savetemplate", "Saves the command-line arguments for this run as a JSON template"]
     ]
   },
   "sites": {
