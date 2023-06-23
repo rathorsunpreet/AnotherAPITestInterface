@@ -8,11 +8,12 @@ let defData = '';
 let schemaData = '';
 const checker = new Validator();
 
-// Location and names of schema files
-const schemaArr = [
-  './test/schema/defaultsSchema.json',
-  './test/schema/templateSchema.json,'
-];
+// Location of schema files
+const schemaPath = './test/schema/';
+// Schema files
+const schemaArr = fs.readdirSync(schemaPath)
+  .filter((item) => path.extname(item).localeCompare('.json') === 0)
+  .map((item) => path.join(schemaPath, item));
 
 // which is boolean
 // true for defaults, false for templates
@@ -34,6 +35,23 @@ function checkIfExists(fname) {
     return true;
   }
   return false;
+}
+
+function loadTemplate(fname) {
+  let tempData = '';
+  if (checkIfExists(fname)) {
+    loadSchema(false);
+    try {
+      tempData = js.parse(fs.readFileSync(fname, 'utf8'));
+      if (!checker.validate(tempData, schemaData).valid) {
+        console.error(`Template ${fname} has incorrect format / value!`);
+        tempData = '';
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  }
+  return tempData;
 }
 
 // Method to load defaults.json
@@ -104,6 +122,7 @@ function getDefValue() {
 }
 
 module.exports = {
+  loadTemplate,
   loadDefaults,
   getEnv,
   getRunner,

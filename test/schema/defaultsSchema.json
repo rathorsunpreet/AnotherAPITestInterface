@@ -40,7 +40,7 @@
           }
         }
       },
-      "required": ["withValue", "withoutValue"],
+      "required": ["withValue", "withoutValue"]
     },
     "sites": {
       "type": "object",
@@ -53,7 +53,7 @@
         },
         "test": {
           "type": "string"
-        },
+        }
       }
     }
   },

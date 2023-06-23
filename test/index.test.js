@@ -1,5 +1,3 @@
 const loader = require('./helpers/loader');
 
-loader.loadDefaults('./test/config/defaults.json');
-
-console.log(loader.getDefValue());
+console.log(loader.loadTemplate('./test/templates/omg.json'));
