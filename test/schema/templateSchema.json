@@ -1,1 +1,56 @@
-
+{
+  "id": "/templateSchema",
+  "type": "object",
+  "properties": {
+    "commands": {
+      "type": "object",
+      "properties": {
+        "env": {
+          "type": "string"
+        },
+        "site": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string"
+        },
+        "excludefiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "runner": {
+          "type": "string"
+        },
+        "templatename": {
+          "type": "string"
+        },
+        "templatedir": {
+          "type": "string"
+        },
+        "testdir": {
+          "type": "string"
+        },
+        "datafile": {
+          "type": "string"
+        },
+        "prod": {
+          "type": "string"
+        },
+        "dev": {
+          "type": "string"
+        },
+        "test": {
+          "type": "string"
+        },
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@ const Validator = require('jsonschema').Validator;
 
 let defData = '';
 let schemaData = '';
-const v = new Validator();
+const checker = new Validator();
 
 // Location and names of schema files
 const schemaArr = [
@@ -44,7 +44,8 @@ function loadDefaults(fname) {
     try {
       defData = js.parse(fs.readFileSync(fname, 'utf8'));
       // If defaults.json does not match schema, defData is set to empty
-       if (!v.validate(defData, schemaData).valid) {
+       if (!checker.validate(defData, schemaData).valid) {
+         console.error('defaults.json file has incorrect format / value!');
          defData = '';
        }
     } catch (err) {
