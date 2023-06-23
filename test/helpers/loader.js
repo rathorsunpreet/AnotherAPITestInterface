@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const js = require('json5');
-const yml = require('yaml');
 const Validator = require('jsonschema').Validator;
 
 let defData = '';
@@ -37,12 +36,20 @@ function checkIfExists(fname) {
   return false;
 }
 
+// Returns parsed template as an object
 function loadTemplate(fname) {
   let tempData = '';
-  if (checkIfExists(fname)) {
+  let filename = '';
+  // Attach .json extension if none is provided
+  if (path.extname(fname) === '') {
+    filename = ''.concat(fname, '.json');
+  } else {
+    filename = fname.slice(0);
+  }
+  if (checkIfExists(filename)) {
     loadSchema(false);
     try {
-      tempData = js.parse(fs.readFileSync(fname, 'utf8'));
+      tempData = js.parse(fs.readFileSync(filename, 'utf8'));
       if (!checker.validate(tempData, schemaData).valid) {
         console.error(`Template ${fname} has incorrect format / value!`);
         tempData = '';
