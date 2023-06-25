@@ -13,7 +13,7 @@
     "token": "asdkhaksf213uoiefewdjo2",
     "runner": "jasmine"
   },
-  "files": [
+  "currentsuitelist": [
     "users",
     "registration"
   ],

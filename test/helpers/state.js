@@ -1,3 +1,4 @@
+/* eslint no-param-reassign: off */
 const fs = require('fs');
 const path = require('path');
 const {
@@ -6,6 +7,10 @@ const {
   getDefValue,
   getSites,
   getAllComm,
+  getEnv,
+  getRunner,
+  loadTemplate,
+  getCommWithoutValue,
 } = require('./loader');
 const {
   getKey,
@@ -22,7 +27,10 @@ const defComm = [
 loadDefaults(defComm[2]);
 const propList = getCommWithValue();
 const defValue = getDefValue();
-const sites = getSites();
+const sitesObj = getSites();
+const envList = getEnv();
+const runnerList = getRunner();
+const commWithoutValue = getCommWithoutValue();
 
 if (propList === '') {
   console.error(`defaults.json was not read at '${defComm[2]}'!`);
@@ -38,14 +46,14 @@ const State = function () {
     }
   });
   // Setup site based on env
-  this.site = sites[this.env];
+  this.site = sitesObj[this.env];
   // Make excludefiles an object
   this.excludefiles = {
     valid: [],
     invalid: [],
   };
-  // Make currentSuiteList an array instead
-  this.currentSuiteList = [];
+  // Make currentsuitelist an array instead
+  this.currentsuitelist = [];
   // Add additional properties
   // Commands used in this run
   this.commandsUsed = {
@@ -74,15 +82,16 @@ const State = function () {
     let invalid = [];
     // Remove all starting and ending spaces
     const newItem = item.map((arg) => arg.trim());
-    // fill this.currentSuiteList with valid suite names
-    this.currentSuiteList = newItem.filter((arg) => this.namedSuiteList.includes(arg));
+    // fill this.currentsuitelist with valid suite names
+    this.currentsuitelist = newItem.filter((arg) => this.namedSuiteList.includes(arg));
+    this.commandsUsed.valid.push('currentsuitelist');
     invalid = newItem.filter((arg) => !this.namedSuiteList.includes(arg));
 
     // Check for the keyword all
     // If all is present and there are more suites mentioned, remove those suites
-    if (this.currentSuiteList.includes('all') && this.currentSuiteList.length !== 1) {
-      this.currentSuiteList.length = 0;
-      this.currentSuiteList.push('all');
+    if (this.currentsuitelist.includes('all') && this.currentsuitelist.length !== 1) {
+      this.currentsuitelist.length = 0;
+      this.currentsuitelist.push('all');
     }
 
     // Iterate over invalid to check for valid commands
@@ -112,6 +121,80 @@ const State = function () {
 
 const stateObj = new State();
 
+const handler = {
+  set(target, prop, value) {
+    // Check env if it is valid
+    if (prop.localeCompare('env') === 0) {
+      if (envList.includes(value)) {
+        // Update site if env is valid
+        target.site = sitesObj[value];
+        return Reflect.set(target, prop, value);
+      }
+      // Check runner if it is valid
+    } else if (prop.localeCompare('runner') === 0) {
+      if (runnerList.includes(value)) {
+        // Update suitedir if runner is valid
+        target.suitedir = path.join(target.suitedir, '../', value, '/');
+        return Reflect.set(target, prop, value);
+      }
+      // If templatename is set, then load template
+      // and apply necessary operations
+    } else if (prop.localeCompare('templatename') === 0) {
+      const tempData = loadTemplate(target[prop]);
+      if (tempData !== '') {
+        if (Object.prototype.hasOwnProperty.call(tempData, 'commands')) {
+          tempData.commands.forEach((item) => {
+            const kvPair = ''.concat(item, '=', tempData.commands[item]);
+            if (propList.includes(item)) {
+              target[prop] = tempData.commands[item];
+              target.commandsUsed.valid.push(kvPair);
+            } else if (commWithoutValue.includes(item)) {
+              target.commandsUsed.valid.push(tempData.commands[item]);
+            } else {
+              target.commandsUsed.invalid.push(kvPair);
+            }
+          });
+        } else if (Object.prototype.hasOwnProperty.call(tempData, 'currentsuitelist')) {
+          tempData.currentsuitelist.forEach((item) => {
+            if (target.namedSuiteList.includes(item)) {
+              if (item.localeCompare('all') === 0) {
+                target.currentsuitelist = [...target.namedSuiteList];
+              } else {
+                target.currentsuitelist.push(item);
+              }
+            }
+          });
+          if (target.currentsuitelist.length !== 0) {
+            target.commandsUsed.valid.push('currentsuitelist');
+          }
+        } else {
+          const propNames = Object.getOwnPropertyNames(tempData);
+          const commIndex = propNames.indexOf('commands');
+          const suiteIndex = propNames.indexOf('currentsuitelist');
+          // Remove commands and currentsuitelist
+          if (commIndex !== -1) {
+            propNames.splice(commIndex, 1);
+          }
+          if (suiteIndex !== -1) {
+            propNames.splice(suiteIndex, 1);
+          }
+          propNames.forEach((item) => {
+            const kv = ''.concat(item, '=', tempData[item]);
+            target.commandsUsed.invalid.push(kv);
+          });
+        }
+      }
+      return true;
+    } else if (Object.prototype.hasOwnProperty.call(target, prop)) {
+      return Reflect.set(target, prop, value);
+    } else {
+      return new Error(`${prop} property of ${target} used!`);
+    }
+  },
+};
+
+const state = new Proxy(stateObj, handler)
+
 module.exports = {
-  stateObj,
+  state,
 };
