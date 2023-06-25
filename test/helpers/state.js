@@ -83,8 +83,11 @@ const State = function () {
     // Remove all starting and ending spaces
     const newItem = item.map((arg) => arg.trim());
     // fill this.currentsuitelist with valid suite names
-    this.currentsuitelist = newItem.filter((arg) => this.namedSuiteList.includes(arg));
-    this.commandsUsed.valid.push('currentsuitelist');
+    const newSuite = newItem.filter((arg) => this.namedSuiteList.includes(arg));
+    if (newSuite.length !== 0) {
+      this.currentsuitelist = [...newSuite];
+      this.commandsUsed.valid.push('currentsuitelist');
+    }
     invalid = newItem.filter((arg) => !this.namedSuiteList.includes(arg));
 
     // Check for the keyword all
@@ -101,12 +104,13 @@ const State = function () {
         const key = getKey(arg);
         const valArr = getValueArr(arg);
         if (this.validCommList.includes(key)) {
-          if (!Array.isArray(valArr)) {
+          if (!Array.isArray(valArr) && valArr !== '') {
             this[key] = valArr.toString();
-          } else {
+            this.commandsUsed.valid.push(arg);
+          } else if (valArr.length !== 0){
             this[key] = [...valArr];
+            this.commandsUsed.valid.push(arg);
           }
-          this.commandsUsed.valid.push(arg);
         } else {
           this.commandsUsed.invalid.push(arg);
         }
@@ -116,6 +120,51 @@ const State = function () {
         this.commandsUsed.invalid.push(arg);
       }
     });
+  };
+
+  this.setupTemplate = function () {
+    const tempData = loadTemplate(path.join(this.templatedir, this.templatename));
+    if (tempData !== '') {
+      const propNames = Object.getOwnPropertyNames(tempData);
+      propNames.forEach((id) => {
+        if (id.localeCompare('commands') === 0) {
+          Object.keys(tempData.commands).forEach((item) => {
+            const kvPair = ''.concat(item, '=', tempData.commands[item]);
+            if (propList.includes(item)) {
+              if (!Array.isArray(tempData.commands[item]) && tempData.commands[item] !== '') {
+                this[item] = tempData.commands[item];
+                this.commandsUsed.valid.push(kvPair);
+              } else if (tempData.commands[item].length !== 0) {
+                let tempVal = tempData.commands[item];
+                this[item] = [...tempVal];
+                this.commandsUsed.valid.push(kvPair);
+              }
+            } else if (commWithoutValue.includes(item)) {
+              if (tempData.commands[item] === true) {
+                this.commandsUsed.valid.push(item);
+              }
+            } else {
+              this.commandsUsed.invalid.push(kvPair);
+            }
+          });
+        } else if (id.localeCompare('currentsuitelist') === 0 
+            && tempData.currentsuitelist.length !== 0) {
+          this.commandsUsed.valid.push('currentsuitelist');
+          tempData.currentsuitelist.forEach((item) => {
+            if (this.namedSuiteList.includes(item)) {
+              if (item.localeCompare('all') === 0) {
+                this.currentsuitelist = [...this.namedSuiteList];
+              } else {
+                this.currentsuitelist.push(item);
+              }
+            }
+          });
+        } else {
+          const kv = ''.concat(id, '=', tempData[id]);
+          this.commandsUsed.invalid.push(kv);
+        }
+      });
+    }
   };
 };
 
@@ -139,7 +188,8 @@ const handler = {
       }
       // If templatename is set, then load template
       // and apply necessary operations
-    } else if (prop.localeCompare('templatename') === 0) {
+    } /*else if (prop.localeCompare('templatename') === 0) {
+      target[prop] = value.slice(0);
       const tempData = loadTemplate(target[prop]);
       if (tempData !== '') {
         if (Object.prototype.hasOwnProperty.call(tempData, 'commands')) {
@@ -185,7 +235,7 @@ const handler = {
         }
       }
       return true;
-    } else if (Object.prototype.hasOwnProperty.call(target, prop)) {
+    } */else if (Object.prototype.hasOwnProperty.call(target, prop)) {
       return Reflect.set(target, prop, value);
     } else {
       return new Error(`${prop} property of ${target} used!`);
@@ -193,8 +243,8 @@ const handler = {
   },
 };
 
-const state = new Proxy(stateObj, handler)
+// const state = new Proxy(stateObj, handler)
 
 module.exports = {
-  state,
+  stateObj,
 };

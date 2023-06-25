@@ -1,7 +1,7 @@
 {
   "commands": {
     "env": "dev",
-    "testdir": "",
+    "suitedir": "",
     "aloha": 123,
     "test": "www.google.ca",
     "site": 'yahoo.com',
@@ -11,7 +11,8 @@
       "multiple"
     ],
     "token": "asdkhaksf213uoiefewdjo2",
-    "runner": "jasmine"
+    "runner": "jasmine",
+    "report": true
   },
   "currentsuitelist": [
     "users",

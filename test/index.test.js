@@ -1,6 +1,8 @@
-const { state } = require('./helpers/state');
-state.setupState(['env=dev', 'users', 'asshole', 'tiken=asdxcggg', 'excludefiles=resources, registration', 'login', 'all'])
-console.dir(state);
+const { stateObj } = require('./helpers/state');
+//stateObj.setupState(['env=dev', 'users', 'asshole', 'excludefiles=resources, registration', 'login']);
+stateObj.setupState(['templatename=omg']);
+stateObj.setupTemplate();
+console.dir(stateObj);
 
 //const loader = require('./helpers/loader');
 

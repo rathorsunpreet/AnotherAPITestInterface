@@ -7,6 +7,7 @@ function getKey(str) {
   return '';
 }
 
+// Returns either an array or a string
 function getValueArr(str) {
   let strArr = '';
   if (str.includes('=')) {
