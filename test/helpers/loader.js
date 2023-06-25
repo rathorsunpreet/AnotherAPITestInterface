@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 const js = require('json5');
-const Validator = require('jsonschema').Validator;
+const { Validator } = require('jsonschema');
 
 let defData = '';
 let schemaData = '';
@@ -69,10 +69,10 @@ function loadDefaults(fname) {
     try {
       defData = js.parse(fs.readFileSync(fname, 'utf8'));
       // If defaults.json does not match schema, defData is set to empty
-       if (!checker.validate(defData, schemaData).valid) {
-         console.error('defaults.json file has incorrect format / value!');
-         defData = '';
-       }
+      if (!checker.validate(defData, schemaData).valid) {
+        console.error('defaults.json file has incorrect format / value!');
+        defData = '';
+      }
     } catch (err) {
       console.error(err);
     }
@@ -103,13 +103,28 @@ function getSites() {
   return defData;
 }
 
-// Get all commands as an array
-function getAllComm() {
+function getCommWithValue() {
   const comm = [];
   if (defData !== '') {
-    defData.commads.withValue.forEach((item) => comm.push(item[0]));
-    defData.commads.withoutValue.forEach((item) => comm.push(item[0]));
+    defData.commands.withValue.forEach((item) => comm.push(item[0]));
     return comm;
+  }
+  return defData;
+}
+
+function getCommWithoutValue() {
+  const comm = [];
+  if (defData !== '') {
+    defData.commands.withoutValue.forEach((item) => comm.push(item[0]));
+    return comm;
+  }
+  return defData;
+}
+
+// Get all commands as an array
+function getAllComm() {
+  if (defData !== '') {
+    return getCommWithValue().concat(getCommWithoutValue());
   }
   return defData;
 }
@@ -120,7 +135,8 @@ function getDefValue() {
   if (defData !== '') {
     defData.commands.withValue.forEach((item) => {
       if (item.length === 3) {
-        comm[item[0]] = item[2];
+        const [name, , val] = item;
+        comm[name] = val;
       }
     });
     return comm;
@@ -134,6 +150,8 @@ module.exports = {
   getEnv,
   getRunner,
   getSites,
+  getCommWithValue,
+  getCommWithoutValue,
   getAllComm,
   getDefValue,
 };

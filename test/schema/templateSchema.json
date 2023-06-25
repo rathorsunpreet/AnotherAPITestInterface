@@ -29,7 +29,7 @@
         "templatedir": {
           "type": "string"
         },
-        "testdir": {
+        "suitedir": {
           "type": "string"
         },
         "datafile": {
@@ -46,7 +46,7 @@
         },
       }
     },
-    "files": {
+    "currentSuiteList": {
       "type": "array",
       "items": {
         "type": "string"
