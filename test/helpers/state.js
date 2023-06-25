@@ -62,6 +62,8 @@ const State = function () {
   this.fullSuiteList.forEach((item) => {
     this.namedSuiteList.push(path.parse(item).name);
   });
+  // Add keyword all to namedSuiteList
+  this.namedSuiteList.push('all');
 
   // Method to setup state
   // item can be array (coming from arguments ui) or
@@ -70,39 +72,41 @@ const State = function () {
     // Array to hold all non-suite names
     // These could be valid or invalid commands
     let invalid = [];
-    // Arguments UI
-    if (Array.isArray(item)) {
-      // Remove all starting and ending spaces
-      const newItem = item.map((arg) => arg.trim());
-      // fill this.currentSuiteList with valid suite names
-      this.currentSuiteList = newItem.filter((arg) => this.namedSuiteList.includes(arg));
-      invalid = newItem.filter((arg) => !this.namedSuiteList.includes(arg));
+    // Remove all starting and ending spaces
+    const newItem = item.map((arg) => arg.trim());
+    // fill this.currentSuiteList with valid suite names
+    this.currentSuiteList = newItem.filter((arg) => this.namedSuiteList.includes(arg));
+    invalid = newItem.filter((arg) => !this.namedSuiteList.includes(arg));
 
-      // Iterate over invalid to check for valid commands
-      // Perform necessary operations if valid commands
-      invalid.forEach((arg) => {
-        if (arg.includes('=')) {
-          const key = getKey(arg);
-          const valArr = getValueArr(arg);
-          if (this.validCommList.includes(key)) {
-            if (!Array.isArray(valArr)) {
-              this[key] = valArr.toString();
-            } else {
-              this[key] = [...valArr];
-            }
-            this.commandsUsed.valid.push(arg);
+    // Check for the keyword all
+    // If all is present and there are more suites mentioned, remove those suites
+    if (this.currentSuiteList.includes('all') && this.currentSuiteList.length !== 1) {
+      this.currentSuiteList.length = 0;
+      this.currentSuiteList.push('all');
+    }
+
+    // Iterate over invalid to check for valid commands
+    // Perform necessary operations if valid commands
+    invalid.forEach((arg) => {
+      if (arg.includes('=')) {
+        const key = getKey(arg);
+        const valArr = getValueArr(arg);
+        if (this.validCommList.includes(key)) {
+          if (!Array.isArray(valArr)) {
+            this[key] = valArr.toString();
           } else {
-            this.commandsUsed.invalid.push(arg);
+            this[key] = [...valArr];
           }
-        } else if (this.validCommList.includes(arg)) {
           this.commandsUsed.valid.push(arg);
         } else {
           this.commandsUsed.invalid.push(arg);
         }
-      });
-    } else {
-      
-    }
+      } else if (this.validCommList.includes(arg)) {
+        this.commandsUsed.valid.push(arg);
+      } else {
+        this.commandsUsed.invalid.push(arg);
+      }
+    });
   };
 };
 

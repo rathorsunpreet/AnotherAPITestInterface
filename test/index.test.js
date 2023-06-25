@@ -1,5 +1,5 @@
 const { stateObj } = require('./helpers/state');
-stateObj.setupState(['env=dev', 'users', 'asshole', 'tiken=asdxcggg', 'excludefiles=resources, registration', 'login'])
+stateObj.setupState(['env=dev', 'users', 'asshole', 'tiken=asdxcggg', 'excludefiles=resources, registration', 'login', 'all'])
 console.dir(stateObj);
 
 //const loader = require('./helpers/loader');
