@@ -1,5 +1,5 @@
 const { stateObj } = require('./helpers/state');
-//stateObj.setupState(['env=dev', 'users', 'asshole', 'excludefiles=resources, registration', 'login']);
+//stateObj.setupState(['env=dev', 'users', 'asshole', 'excludefiles=registration', 'login', 'all']);
 stateObj.setupState(['templatename=omg']);
 stateObj.setupTemplate();
 console.dir(stateObj);

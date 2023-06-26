@@ -8,7 +8,8 @@
     "howdy": "idontknow",
     "excludefiles": [
       "single",
-      "multiple"
+      "multiple",
+      "shitface"
     ],
     "token": "asdkhaksf213uoiefewdjo2",
     "runner": "jasmine",
@@ -16,7 +17,8 @@
   },
   "currentsuitelist": [
     "users",
-    "registration"
+    "registration",
+    "single"
   ],
   "shite": "pissbrain",
   "numbers": 123

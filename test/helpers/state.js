@@ -1,4 +1,4 @@
-/* eslint no-param-reassign: off */
+/* eslint no-param-reassign: off, max-len: ["error", { "code": 120 }] */
 const fs = require('fs');
 const path = require('path');
 const {
@@ -70,8 +70,13 @@ const State = function () {
   this.fullSuiteList.forEach((item) => {
     this.namedSuiteList.push(path.parse(item).name);
   });
-  // Add keyword all to namedSuiteList
-  this.namedSuiteList.push('all');
+
+  // Method to display all available suites, also includes the keyword 'all'
+  this.showList = function () {
+    const newList = [...this.namedSuiteList];
+    newList.push('all');
+    console.log(newList);
+  };
 
   // Method to setup state
   // item can be array (coming from arguments ui) or
@@ -83,18 +88,24 @@ const State = function () {
     // Remove all starting and ending spaces
     const newItem = item.map((arg) => arg.trim());
     // fill this.currentsuitelist with valid suite names
-    const newSuite = newItem.filter((arg) => this.namedSuiteList.includes(arg));
+    const newSuite = [];
+    newItem.forEach((suite) => {
+      if (suite.localeCompare('all') === 0) {
+        this.currentsuitelist = [...this.namedSuiteList];
+      } else if (this.namedSuiteList.includes(suite) && !this.currentsuitelist.includes(suite)) {
+        this.currentsuitelist.push(suite);
+      }
+    });
+
     if (newSuite.length !== 0) {
       this.currentsuitelist = [...newSuite];
       this.commandsUsed.valid.push('currentsuitelist');
     }
     invalid = newItem.filter((arg) => !this.namedSuiteList.includes(arg));
-
-    // Check for the keyword all
-    // If all is present and there are more suites mentioned, remove those suites
-    if (this.currentsuitelist.includes('all') && this.currentsuitelist.length !== 1) {
-      this.currentsuitelist.length = 0;
-      this.currentsuitelist.push('all');
+    // Remove all from invalid
+    if (invalid.includes('all')) {
+      const allIndex = invalid.indexOf('all');
+      invalid.splice(allIndex, 1);
     }
 
     // Iterate over invalid to check for valid commands
@@ -105,11 +116,24 @@ const State = function () {
         const valArr = getValueArr(arg);
         if (this.validCommList.includes(key)) {
           if (!Array.isArray(valArr) && valArr !== '') {
-            this[key] = valArr.toString();
-            this.commandsUsed.valid.push(arg);
-          } else if (valArr.length !== 0){
-            this[key] = [...valArr];
-            this.commandsUsed.valid.push(arg);
+            if (key.localeCompare('excludefiles') === 0) {
+              if (this.namedSuiteList.includes(valArr)) {
+                this.excludefiles.valid = [valArr];
+              } else {
+                this.excludefiles.invalid = [valArr];
+              }
+            } else {
+              this[key] = valArr.toString();
+            }
+            this.commandsUsed.valid.push(key);
+          } else if (valArr.length !== 0) {
+            if (key.localeCompare('excludefiles') === 0) {
+              this.excludefiles.valid = valArr.filter((sname) => this.namedSuiteList.includes(sname));
+              this.excludefiles.invalid = valArr.filter((sname) => !this.namedSuiteList.includes(sname));
+            } else {
+              this[key] = [...valArr];
+            }
+            this.commandsUsed.valid.push(key);
           }
         } else {
           this.commandsUsed.invalid.push(arg);
@@ -120,8 +144,15 @@ const State = function () {
         this.commandsUsed.invalid.push(arg);
       }
     });
+    // Remove suites mentioned in excludefiles.valid from currentsuitelist
+    if (this.excludefiles.valid.length !== 0) {
+      this.currentsuitelist = this.currentsuitelist.filter((suite) => !this.excludefiles.valid.includes(suite));
+    }
   };
 
+  // Only call this when both of the following conditions are met:
+  // 1. setupState was called first
+  // 2. command 'templatename=somename' was used
   this.setupTemplate = function () {
     const tempData = loadTemplate(path.join(this.templatedir, this.templatename));
     if (tempData !== '') {
@@ -131,39 +162,50 @@ const State = function () {
           Object.keys(tempData.commands).forEach((item) => {
             const kvPair = ''.concat(item, '=', tempData.commands[item]);
             if (propList.includes(item)) {
-              if (!Array.isArray(tempData.commands[item]) && tempData.commands[item] !== '') {
-                this[item] = tempData.commands[item];
-                this.commandsUsed.valid.push(kvPair);
-              } else if (tempData.commands[item].length !== 0) {
-                let tempVal = tempData.commands[item];
-                this[item] = [...tempVal];
-                this.commandsUsed.valid.push(kvPair);
+              if (!this.commandsUsed.valid.includes(item)) {
+                if (!Array.isArray(tempData.commands[item]) && tempData.commands[item] !== '') {
+                  this[item] = tempData.commands[item];
+                  this.commandsUsed.valid.push(item);
+                } else if (tempData.commands[item].length !== 0) {
+                  const tempVal = tempData.commands[item];
+                  if (item.localeCompare('excludefiles') === 0) {
+                    this.excludefiles.valid = tempVal.filter((sname) => this.namedSuiteList.includes(sname));
+                    this.excludefiles.invalid = tempVal.filter((sname) => !this.namedSuiteList.includes(sname));
+                  } else {
+                    this[item] = [...tempVal];
+                  }
+                  this.commandsUsed.valid.push(item);
+                }
               }
             } else if (commWithoutValue.includes(item)) {
-              if (tempData.commands[item] === true) {
+              if (tempData.commands[item] === true && !this.commandsUsed.valid.includes(item)) {
                 this.commandsUsed.valid.push(item);
               }
             } else {
               this.commandsUsed.invalid.push(kvPair);
             }
           });
-        } else if (id.localeCompare('currentsuitelist') === 0 
+        } else if (id.localeCompare('currentsuitelist') === 0
             && tempData.currentsuitelist.length !== 0) {
-          this.commandsUsed.valid.push('currentsuitelist');
-          tempData.currentsuitelist.forEach((item) => {
-            if (this.namedSuiteList.includes(item)) {
+          if (!this.commandsUsed.valid.includes('currentsuitelist')) {
+            this.commandsUsed.valid.push('currentsuitelist');
+            tempData.currentsuitelist.forEach((item) => {
               if (item.localeCompare('all') === 0) {
                 this.currentsuitelist = [...this.namedSuiteList];
-              } else {
+              } else if (this.namedSuiteList.includes(item) && !this.currentsuitelist.includes(item)) {
                 this.currentsuitelist.push(item);
               }
-            }
-          });
+            });
+          }
         } else {
           const kv = ''.concat(id, '=', tempData[id]);
           this.commandsUsed.invalid.push(kv);
         }
       });
+      // Remove suites mentioned in excludefiles.valid from currentsuitelist
+      if (this.excludefiles.valid.length !== 0) {
+        this.currentsuitelist = this.currentsuitelist.filter((suite) => !this.excludefiles.valid.includes(suite));
+      }
     }
   };
 };
@@ -186,64 +228,14 @@ const handler = {
         target.suitedir = path.join(target.suitedir, '../', value, '/');
         return Reflect.set(target, prop, value);
       }
-      // If templatename is set, then load template
-      // and apply necessary operations
-    } /*else if (prop.localeCompare('templatename') === 0) {
-      target[prop] = value.slice(0);
-      const tempData = loadTemplate(target[prop]);
-      if (tempData !== '') {
-        if (Object.prototype.hasOwnProperty.call(tempData, 'commands')) {
-          tempData.commands.forEach((item) => {
-            const kvPair = ''.concat(item, '=', tempData.commands[item]);
-            if (propList.includes(item)) {
-              target[prop] = tempData.commands[item];
-              target.commandsUsed.valid.push(kvPair);
-            } else if (commWithoutValue.includes(item)) {
-              target.commandsUsed.valid.push(tempData.commands[item]);
-            } else {
-              target.commandsUsed.invalid.push(kvPair);
-            }
-          });
-        } else if (Object.prototype.hasOwnProperty.call(tempData, 'currentsuitelist')) {
-          tempData.currentsuitelist.forEach((item) => {
-            if (target.namedSuiteList.includes(item)) {
-              if (item.localeCompare('all') === 0) {
-                target.currentsuitelist = [...target.namedSuiteList];
-              } else {
-                target.currentsuitelist.push(item);
-              }
-            }
-          });
-          if (target.currentsuitelist.length !== 0) {
-            target.commandsUsed.valid.push('currentsuitelist');
-          }
-        } else {
-          const propNames = Object.getOwnPropertyNames(tempData);
-          const commIndex = propNames.indexOf('commands');
-          const suiteIndex = propNames.indexOf('currentsuitelist');
-          // Remove commands and currentsuitelist
-          if (commIndex !== -1) {
-            propNames.splice(commIndex, 1);
-          }
-          if (suiteIndex !== -1) {
-            propNames.splice(suiteIndex, 1);
-          }
-          propNames.forEach((item) => {
-            const kv = ''.concat(item, '=', tempData[item]);
-            target.commandsUsed.invalid.push(kv);
-          });
-        }
-      }
-      return true;
-    } */else if (Object.prototype.hasOwnProperty.call(target, prop)) {
+    } else if (Object.prototype.hasOwnProperty.call(target, prop)) {
       return Reflect.set(target, prop, value);
-    } else {
-      return new Error(`${prop} property of ${target} used!`);
     }
+    return new Error(`${prop} property of ${target} used!`);
   },
 };
 
-// const state = new Proxy(stateObj, handler)
+// const stateProxy = new Proxy(stateObj, handler)
 
 module.exports = {
   stateObj,
