@@ -1,1 +1,1 @@
-2. In final check for commands (invalid for setupState()), add checks for compound commands like test=site.
+

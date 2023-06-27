@@ -1,6 +1,9 @@
 /* eslint no-param-reassign: off, max-len: ["error", { "code": 120 }] */
 const fs = require('fs');
 const path = require('path');
+const figlet = require('figlet');
+const colors = require('ansi-colors');
+const columinfy = require('columnify');
 const {
   loadDefaults,
   getCommWithValue,
@@ -11,6 +14,8 @@ const {
   getRunner,
   loadTemplate,
   getCommWithoutValue,
+  getCommDesc,
+  writeFile,
 } = require('./loader');
 const {
   getKey,
@@ -81,6 +86,66 @@ const State = function () {
     const newList = [...this.namedSuiteList];
     newList.push('all');
     console.log(newList);
+  };
+  
+  // Help message
+  this.showHelp = function () {
+    const cdPair = getCommDesc();
+    const columns = columinfy(cdPair, { showHeaders: false });
+    console.log(figlet.textSync('Another API Test Interface', {
+      font: 'Cybermedium',
+      horizontalLayout: 'default',
+      verticalLayout: 'default',
+      width: 180,
+      whitespaceBreak: true,
+    }));
+    console.log('This is a successor to Simple API Test Interface.');
+    console.log('');
+    console.log(`${colors.yellow.bold('Usage')}: `);
+    console.log(`${colors.red.bold('npm run test command/suite name(s)')}`);
+    console.log('This executes the mentioned command or suite(s) provided they are valid.');
+    console.log(`Use the word "${colors.red.bold('all')}" to execute all test suites.`);
+    console.log('');
+    console.log(`Test suites/cases need to be put into "${colors.red.bold(this.suitedir)}" for the system to detect them.`);
+    console.log(`If site needs to be updated, then change it in "${colors.red.bold("add name here")}".`);
+    console.log('Only javascript files are detected.');
+    console.log('');
+    console.log('The following commands are available: ');
+    console.log(columns);
+  };
+  
+  this.saveTemplate = function () {
+    // Create a new deep copy
+    const newThis = JSON.parse(JSON.stringify(this));
+    // Delete *commandsUsed
+    delete newThis.argsCommandsUsed;
+    delete newThis.tempCommandsUsed;
+    // Delete all methods
+    const allMethodsList = Object.getOwnPropertyNames(newThis).filter((item) => typeof newThis[item] === 'function');
+    allMethodsList.forEach((item) => {
+      delete newThis[item];
+    });
+    // Delete command list
+    delete newThis.validCommList;
+    // Delete all valid suite lists
+    delete newThis.fullSuiteList;
+    delete newThis.namedSuiteList;
+
+    const savedTemp = {
+      commands: {},
+    };
+    Object.keys(newThis).forEach((item) => {
+      if (item.localeCompare('currentsuitelist') !== 0) {
+        if (item.localeCompare('excludefiles') === 0) {
+          savedTemp.commands[item] = newThis[item].valid;
+        } else {
+          savedTemp.commands[item] = newThis[item];
+        }
+      } else {
+        savedTemp[item] = newThis[item];
+      }
+    });
+    writeFile(savedTemp, newThis.templatedir, newThis.templatename);
   };
 
   // Method to setup state

@@ -144,6 +144,40 @@ function getDefValue() {
   return defData;
 }
 
+// Returns object with command-description pair
+function getCommDesc() {
+  const cdPair = {};
+  if (defData !== '') {
+    defData.commands.withValue.forEach((item) => {
+      const [name, desc] = item;
+      cdPair[name] = desc;
+    });
+    defData.commands.withoutValue.forEach((item) => {
+      const [name, desc] = item;
+      cdPair[name] = desc;
+    });
+    return cdPair;
+  }
+  return defData;
+}
+
+function writeFile(obj, location, name) {
+  let newName = '';
+  if (name === '') {
+    const dnow = Math.floor(Date.now() / 1000);
+    newName = obj.commands.env.concat('_', dnow, '.json');
+  } else {
+    newName = name;
+  }
+  const newLocation = ''.concat(location, newName);
+  try {
+    fs.writeFileSync(newLocation, JSON.stringify(obj, null, 2), 'utf8');
+    console.log(`Template has been saved as ${newLocation}`);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
 module.exports = {
   loadTemplate,
   loadDefaults,
@@ -154,4 +188,6 @@ module.exports = {
   getCommWithoutValue,
   getAllComm,
   getDefValue,
+  getCommDesc,
+  writeFile,
 };
