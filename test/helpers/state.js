@@ -55,10 +55,15 @@ const State = function () {
   // Make currentsuitelist an array instead
   this.currentsuitelist = [];
   // Add additional properties
-  // Commands used in this run
-  this.commandsUsed = {
+  // Commands used in this run supplied as arguments
+  this.argsCommandsUsed = {
     valid: [],
     invalid: [],
+  };
+  // Commands used when performing read on a template file
+  this.tempCommandsUsed = {
+    valid: [],
+    invalid: []
   };
   // List of all valid commands
   this.validCommList = getAllComm();
@@ -79,8 +84,6 @@ const State = function () {
   };
 
   // Method to setup state
-  // item can be array (coming from arguments ui) or
-  // an object (coming from templates ui)
   this.setupState = function (item) {
     // Array to hold all non-suite names
     // These could be valid or invalid commands
@@ -88,7 +91,6 @@ const State = function () {
     // Remove all starting and ending spaces
     const newItem = item.map((arg) => arg.trim());
     // fill this.currentsuitelist with valid suite names
-    const newSuite = [];
     newItem.forEach((suite) => {
       if (suite.localeCompare('all') === 0) {
         this.currentsuitelist = [...this.namedSuiteList];
@@ -97,9 +99,8 @@ const State = function () {
       }
     });
 
-    if (newSuite.length !== 0) {
-      this.currentsuitelist = [...newSuite];
-      this.commandsUsed.valid.push('currentsuitelist');
+    if (this.currentsuitelist.length !== 0) {
+      this.argsCommandsUsed.valid.push('currentsuitelist');
     }
     invalid = newItem.filter((arg) => !this.namedSuiteList.includes(arg));
     // Remove all from invalid
@@ -111,6 +112,7 @@ const State = function () {
     // Iterate over invalid to check for valid commands
     // Perform necessary operations if valid commands
     invalid.forEach((arg) => {
+      // Check if the command has an = sign
       if (arg.includes('=')) {
         const key = getKey(arg);
         const valArr = getValueArr(arg);
@@ -125,7 +127,9 @@ const State = function () {
             } else {
               this[key] = valArr.toString();
             }
-            this.commandsUsed.valid.push(key);
+            if (!this.argsCommandsUsed.valid.includes(key)) {
+              this.argsCommandsUsed.valid.push(key);
+            }
           } else if (valArr.length !== 0) {
             if (key.localeCompare('excludefiles') === 0) {
               this.excludefiles.valid = valArr.filter((sname) => this.namedSuiteList.includes(sname));
@@ -133,15 +137,34 @@ const State = function () {
             } else {
               this[key] = [...valArr];
             }
-            this.commandsUsed.valid.push(key);
+            if (!this.argsCommandsUsed.valid.includes(key)) {
+              this.argsCommandsUsed.valid.push(key);
+            }
+          }
+          // Command is a compund command of type env=site
+          // For example: dev=newsite
+          // This breaks down into the following commands:
+          // 1. env=dev
+          // 2. site=newsite
+        } else if (envList.includes(key)) {
+          this.env = key;
+          this.site = valArr;
+          if (!this.argsCommandsUsed.valid.includes('env')) {
+            this.argsCommandsUsed.valid.push('env');
+          }
+          if (!this.argsCommandsUsed.valid.includes('site')) {
+            this.argsCommandsUsed.valid.push('site');
           }
         } else {
-          this.commandsUsed.invalid.push(arg);
+          this.argsCommandsUsed.invalid.push(arg);
         }
+        // Command is without an = sign
       } else if (this.validCommList.includes(arg)) {
-        this.commandsUsed.valid.push(arg);
+        if (!this.argsCommandsUsed.valid.includes(arg)) {
+          this.argsCommandsUsed.valid.push(arg);
+        }
       } else {
-        this.commandsUsed.invalid.push(arg);
+        this.argsCommandsUsed.invalid.push(arg);
       }
     });
     // Remove suites mentioned in excludefiles.valid from currentsuitelist
@@ -159,36 +182,55 @@ const State = function () {
       const propNames = Object.getOwnPropertyNames(tempData);
       propNames.forEach((id) => {
         if (id.localeCompare('commands') === 0) {
+          // Iterate over tempData.commands block
+          // If valid commands then perform necessary operations
           Object.keys(tempData.commands).forEach((item) => {
             const kvPair = ''.concat(item, '=', tempData.commands[item]);
-            if (propList.includes(item)) {
-              if (!this.commandsUsed.valid.includes(item)) {
-                if (!Array.isArray(tempData.commands[item]) && tempData.commands[item] !== '') {
-                  this[item] = tempData.commands[item];
-                  this.commandsUsed.valid.push(item);
-                } else if (tempData.commands[item].length !== 0) {
-                  const tempVal = tempData.commands[item];
-                  if (item.localeCompare('excludefiles') === 0) {
-                    this.excludefiles.valid = tempVal.filter((sname) => this.namedSuiteList.includes(sname));
-                    this.excludefiles.invalid = tempVal.filter((sname) => !this.namedSuiteList.includes(sname));
-                  } else {
-                    this[item] = [...tempVal];
+            //console.log(kvPair + ':' + !this.argsCommandsUsed.valid.includes(item));
+            if (!this.argsCommandsUsed.valid.includes(item)) {
+              if (propList.includes(item)) {
+                  if (!Array.isArray(tempData.commands[item]) && tempData.commands[item] !== '') {
+                    //console.log(kvPair);
+                    this[item] = tempData.commands[item];
+                    if (!this.tempCommandsUsed.valid.includes(item)) {
+                      this.tempCommandsUsed.valid.push(item);
+                    }
+                  } else if (tempData.commands[item].length !== 0) {
+                    const tempVal = tempData.commands[item];
+                    if (item.localeCompare('excludefiles') === 0) {
+                      this.excludefiles.valid = tempVal.filter((sname) => this.namedSuiteList.includes(sname));
+                      this.excludefiles.invalid = tempVal.filter((sname) => !this.namedSuiteList.includes(sname));
+                    } else {
+                      this[item] = [...tempVal];
+                    }
+                    if (!this.tempCommandsUsed.valid.includes(item)) {
+                      this.tempCommandsUsed.valid.push(item);
+                    }
                   }
-                  this.commandsUsed.valid.push(item);
+              } else if (commWithoutValue.includes(item)) {
+                if (tempData.commands[item] === true && !this.tempCommandsUsed.valid.includes(item)) {
+                  this.tempCommandsUsed.valid.push(item);
                 }
+                // Handle dev=newsite command
+              } else if (envList.includes(item) && !this.argsCommandsUsed.valid.includes('env')) {
+                this.env = item;
+                this.site = tempData.commands[item];
+                if (!this.tempCommandsUsed.valid.includes('env')) {
+                  this.tempCommandsUsed.valid.push('env');
+                }
+                if (!this.tempCommandsUsed.valid.includes(tempData.commands[item])) {
+                  this.tempCommandsUsed.valid.push('site');
+                }
+              } else {
+                this.tempCommandsUsed.invalid.push(kvPair);
               }
-            } else if (commWithoutValue.includes(item)) {
-              if (tempData.commands[item] === true && !this.commandsUsed.valid.includes(item)) {
-                this.commandsUsed.valid.push(item);
-              }
-            } else {
-              this.commandsUsed.invalid.push(kvPair);
             }
           });
         } else if (id.localeCompare('currentsuitelist') === 0
             && tempData.currentsuitelist.length !== 0) {
-          if (!this.commandsUsed.valid.includes('currentsuitelist')) {
-            this.commandsUsed.valid.push('currentsuitelist');
+          if (!this.tempCommandsUsed.valid.includes('currentsuitelist')
+            && !this.argsCommandsUsed.valid.includes('currentsuitelist')) {
+            this.tempCommandsUsed.valid.push('currentsuitelist');
             tempData.currentsuitelist.forEach((item) => {
               if (item.localeCompare('all') === 0) {
                 this.currentsuitelist = [...this.namedSuiteList];
@@ -199,7 +241,7 @@ const State = function () {
           }
         } else {
           const kv = ''.concat(id, '=', tempData[id]);
-          this.commandsUsed.invalid.push(kv);
+          this.tempCommandsUsed.invalid.push(kv);
         }
       });
       // Remove suites mentioned in excludefiles.valid from currentsuitelist

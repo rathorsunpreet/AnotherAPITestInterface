@@ -1,6 +1,6 @@
 {
   "commands": {
-    "env": "dev",
+    "env": "prod",
     "suitedir": "",
     "aloha": 123,
     "test": "www.google.ca",
