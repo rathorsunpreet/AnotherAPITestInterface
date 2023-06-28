@@ -30,7 +30,8 @@ if (stateProxy.argsCommandsUsed.valid.includes('help')) {
     stateProxy.saveTemplate();
 } else if (stateProxy.argsCommandsUsed.valid.includes('templatename')) {
     stateProxy.setupTemplate();
-} else {
+}
+if (stateProxy.currentsuitelist.length !== 0) {
   // Execute stateProxy.currentsuitelist array here
   const runnerObj = {
     runner: stateProxy.runner,
