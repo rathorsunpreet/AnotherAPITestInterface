@@ -1,5 +1,6 @@
 const colors = require('ansi-colors');
 const { stateProxy } = require('./helpers/state');
+const runners = require('./runners/runners');
 
 if (process.argv.length === 2) {
   console.log('No arguments provided!');
@@ -29,6 +30,18 @@ if (stateProxy.argsCommandsUsed.valid.includes('help')) {
     stateProxy.setupTemplate();
 } else {
   // Execute stateProxy.currentsuitelist array here
+  const runnerObj = {
+    runner: stateProxy.runner,
+    suiteList: stateProxy.currentsuitelist,
+    suitePath: stateProxy.suitedir,
+  };
+  if (stateProxy.argsCommandsUsed.valid.includes('report')
+  || stateProxy.tempCommandsUsed.valid.includes('report')) {
+    runnerObj.report = true;
+  }
+  console.dir(runnerObj);
+  runners.addFiles(runnerObj);
+  runners.executeRunner(runnerObj.report, runnerObj.runner);
 }
 
 //console.dir(stateProxy);

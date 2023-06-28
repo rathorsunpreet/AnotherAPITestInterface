@@ -3,7 +3,7 @@ const {
   expect,
   data,
   colors,
-} = require('../helpers/libs');
+} = require('../../helpers/libs');
 
 const testName = `${colors.bgGreen('/unknown Endpoint - multiple file')}`;
 

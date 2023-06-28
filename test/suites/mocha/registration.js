@@ -3,7 +3,7 @@ const {
   expect,
   data,
   colors,
-} = require('../helpers/libs');
+} = require('../../helpers/libs');
 
 let response = '';
 
