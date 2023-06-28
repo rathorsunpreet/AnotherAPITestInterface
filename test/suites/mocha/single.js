@@ -5,7 +5,7 @@ const {
   colors,
 } = require('../../helpers/libs');
 
-let response= '';
+let response = '';
 
 const suiteName = `${colors.bgGreen('/login Endpoint - single file')}`;
 

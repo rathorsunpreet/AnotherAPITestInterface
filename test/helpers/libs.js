@@ -1,3 +1,4 @@
+/* eslint-disable import/newline-after-import, import/order, import/no-dynamic-require */
 const { expect } = require('chai');
 const colors = require('ansi-colors');
 const path = require('path');
