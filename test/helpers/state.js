@@ -1,4 +1,4 @@
-/* eslint no-param-reassign: off, max-len: ["error", { "code": 120 }] */
+/* eslint no-param-reassign: off, max-len: ["error", { "code": 150 }] */
 const fs = require('fs');
 const path = require('path');
 const figlet = require('figlet');
@@ -68,7 +68,7 @@ const State = function () {
   // Commands used when performing read on a template file
   this.tempCommandsUsed = {
     valid: [],
-    invalid: []
+    invalid: [],
   };
   // List of all valid commands
   this.validCommList = getAllComm();
@@ -81,13 +81,23 @@ const State = function () {
     this.namedSuiteList.push(path.parse(item).name);
   });
 
+  // Method to display default.json's values for env, runner and site
+  this.displayDef = function (param) {
+    switch (param) {
+      case 'env': return envList;
+      case 'runner': return runnerList;
+      case 'sites': return sitesObj;
+      default: throw new Error('No parameters provided!');
+    }
+  };
+
   // Method to display all available suites, also includes the keyword 'all'
   this.showList = function () {
     const newList = [...this.namedSuiteList];
     newList.push('all');
     console.log(newList);
   };
-  
+
   // Help message
   this.showHelp = function () {
     const cdPair = getCommDesc();
@@ -106,14 +116,14 @@ const State = function () {
     console.log('This executes the mentioned command or suite(s) provided they are valid.');
     console.log(`Use the word "${colors.red.bold('all')}" to execute all test suites.`);
     console.log('');
-    console.log(`Test suites/cases need to be put into "${colors.red.bold(this.suitedir)}" for the system to detect them.`);
-    console.log(`If site needs to be updated, then change it in "${colors.red.bold("add name here")}".`);
+    console.log(`Mocha Test suites/cases need to be put into "${colors.red.bold(this.suitedir)}" for the system to detect them.`);
+    console.log(`If site needs to be updated, then change it in "${colors.red.bold('add name here')}".`);
     console.log('Only javascript files are detected.');
     console.log('');
     console.log('The following commands are available: ');
     console.log(columns);
   };
-  
+
   this.saveTemplate = function () {
     // Create a new deep copy
     const newThis = JSON.parse(JSON.stringify(this));
@@ -251,27 +261,27 @@ const State = function () {
           // If valid commands then perform necessary operations
           Object.keys(tempData.commands).forEach((item) => {
             const kvPair = ''.concat(item, '=', tempData.commands[item]);
-            //console.log(kvPair + ':' + !this.argsCommandsUsed.valid.includes(item));
+            // console.log(kvPair + ':' + !this.argsCommandsUsed.valid.includes(item));
             if (!this.argsCommandsUsed.valid.includes(item)) {
               if (propList.includes(item)) {
-                  if (!Array.isArray(tempData.commands[item]) && tempData.commands[item] !== '') {
-                    //console.log(kvPair);
-                    this[item] = tempData.commands[item];
-                    if (!this.tempCommandsUsed.valid.includes(item)) {
-                      this.tempCommandsUsed.valid.push(item);
-                    }
-                  } else if (tempData.commands[item].length !== 0) {
-                    const tempVal = tempData.commands[item];
-                    if (item.localeCompare('excludefiles') === 0) {
-                      this.excludefiles.valid = tempVal.filter((sname) => this.namedSuiteList.includes(sname));
-                      this.excludefiles.invalid = tempVal.filter((sname) => !this.namedSuiteList.includes(sname));
-                    } else {
-                      this[item] = [...tempVal];
-                    }
-                    if (!this.tempCommandsUsed.valid.includes(item)) {
-                      this.tempCommandsUsed.valid.push(item);
-                    }
+                if (!Array.isArray(tempData.commands[item]) && tempData.commands[item] !== '') {
+                  // console.log(kvPair);
+                  this[item] = tempData.commands[item];
+                  if (!this.tempCommandsUsed.valid.includes(item)) {
+                    this.tempCommandsUsed.valid.push(item);
                   }
+                } else if (tempData.commands[item].length !== 0) {
+                  const tempVal = tempData.commands[item];
+                  if (item.localeCompare('excludefiles') === 0) {
+                    this.excludefiles.valid = tempVal.filter((sname) => this.namedSuiteList.includes(sname));
+                    this.excludefiles.invalid = tempVal.filter((sname) => !this.namedSuiteList.includes(sname));
+                  } else {
+                    this[item] = [...tempVal];
+                  }
+                  if (!this.tempCommandsUsed.valid.includes(item)) {
+                    this.tempCommandsUsed.valid.push(item);
+                  }
+                }
               } else if (commWithoutValue.includes(item)) {
                 if (tempData.commands[item] === true && !this.tempCommandsUsed.valid.includes(item)) {
                   this.tempCommandsUsed.valid.push(item);
@@ -342,8 +352,8 @@ const handler = {
   },
 };
 
-// const stateProxy = new Proxy(stateObj, handler)
+const stateProxy = new Proxy(stateObj, handler);
 
 module.exports = {
-  stateObj,
+  stateProxy,
 };

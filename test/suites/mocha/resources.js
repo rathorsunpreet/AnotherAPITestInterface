@@ -1,14 +1,13 @@
 const {
   request,
   expect,
-  userData,
-  clc,
-  state,
-} = require('../../helpers/common_libraries');
+  data,
+  colors,
+} = require('../helpers/libs');
 
-let response;
+let response = '';
 
-const testName = clc.black.bgWhite('/unknown Endpoint - resources file');
+const testName = `${colors.bgGreen('/unknown Endpoint - resources file')}`;
 
 describe(testName, function () {
   // GET Requests
@@ -16,7 +15,7 @@ describe(testName, function () {
     context('List Check', function () {
       context('Valid Tests', function () {
         before(async function () {
-          response = await request(state.site).get('/api/unknown');
+          response = await request.get('/api/unknown');
         });
         it('Status Code is 200', function () {
           expect(response.status).to.eql(200);
@@ -30,7 +29,7 @@ describe(testName, function () {
     context('Single Check', function () {
       context('Valid Tests', function () {
         before(async function () {
-          response = await request(state.site).get(`/api/uknown/${userData.goodId}`);
+          response = await request.get(`/api/uknown/${data.goodId}`);
         });
         it('Status Code is 200', function () {
           expect(response.status).to.eql(200);
@@ -38,7 +37,7 @@ describe(testName, function () {
       });
       context('Invalid Tests', function () {
         before(async function () {
-          response = await request(state.site).get(`/api/unknown/${userData.badId}`);
+          response = await request.get(`/api/unknown/${data.badId}`);
         });
         it('Status Code is 404', function () {
           expect(response.status).to.eql(404);

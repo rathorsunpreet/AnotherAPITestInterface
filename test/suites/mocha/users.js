@@ -1,15 +1,14 @@
 const {
   request,
   expect,
-  userData,
-  clc,
-  state,
-} = require('../../helpers/common_libraries');
+  data,
+  colors,
+} = require('../helpers/libs');
 
-let response;
-let userId;
+let response = '';
+let userId = '';
 
-const testName = clc.black.bgWhite('/users Endpoint - users file');
+const testName = `${colors.bgGreen('/users Endpoint - users file')}`;
 
 describe(testName, function () {
   // GET Requests
@@ -17,7 +16,7 @@ describe(testName, function () {
     context('List Check', function () {
       context('Valid Tests', function () {
         before(async function () {
-          response = await request(state.site).get(`/api/users?page=${userData.goodId}`);
+          response = await request.get(`/api/users?page=${data.goodId}`);
         });
         it('Status Code is 200', function () {
           expect(response.status).to.eql(200);
@@ -31,7 +30,7 @@ describe(testName, function () {
     context('Single Check', function () {
       context('Valid Tests', function () {
         before(async function () {
-          response = await request(state.site).get(`/api/users/${userData.goodId}`);
+          response = await request.get(`/api/users/${data.goodId}`);
         });
         it('Status Code is 200', function () {
           expect(response.status).to.eql(200);
@@ -42,7 +41,7 @@ describe(testName, function () {
       });
       context('Invalid Tests', function () {
         before(async function () {
-          response = await request(state.site).get(`/api/users/${userData.badId}`);
+          response = await request.get(`/api/users/${data.badId}`);
         });
         it('Status Code is 404', function () {
           expect(response.status).to.eql(404);
@@ -57,7 +56,7 @@ describe(testName, function () {
       this.timeout(3500);
       context('Valid Tests', function () {
         before(async function () {
-          response = await request(state.site).get(`/api/users?delay=${userData.delayedId}`);
+          response = await request.get(`/api/users?delay=${data.delayedId}`);
         });
         it('Status Code is 200', function () {
           expect(response.status).to.eql(200);
@@ -70,7 +69,7 @@ describe(testName, function () {
   describe('POST', function () {
     context('Valid Tests', function () {
       before(async function () {
-        response = await request(state.site).post('/api/users').send(userData.usersPost);
+        response = await request.post('/api/users').send(data.usersPost);
       });
       it('Status Code is 201', function () {
         expect(response.status).to.eql(201);
@@ -83,7 +82,7 @@ describe(testName, function () {
   describe('PUT', function () {
     context('Valid Tests', function () {
       before(async function () {
-        response = await request(state.site).put(`/api/users/${userId}`).send(userData.usersPut);
+        response = await request.put(`/api/users/${userId}`).send(data.usersPut);
       });
       it('Status Code is 200', function () {
         expect(response.status).to.eql(200);
@@ -95,7 +94,7 @@ describe(testName, function () {
   describe('PATCH', function () {
     context('Valid Tests', function () {
       before(async function () {
-        response = await request(state.site).patch(`/api/users/${userId}`).send(userData.usersPut);
+        response = await request.patch(`/api/users/${userId}`).send(data.usersPut);
       });
       it('Status Code is 200', function () {
         expect(response.status).to.eql(200);
@@ -107,7 +106,7 @@ describe(testName, function () {
   describe('DELETE', function () {
     context('Valid Tests', function () {
       before(async function () {
-        response = await request(state.site).delete(`/api/users/${userId}`);
+        response = await request.delete(`/api/users/${userId}`);
       });
       it('Status Code is 204', function () {
         expect(response.status).to.eql(204);

@@ -1,21 +1,20 @@
 const {
   request,
   expect,
-  userData,
-  clc,
-  state,
-} = require('../../helpers/common_libraries');
+  data,
+  colors,
+} = require('../helpers/libs');
 
-let response;
+let response = '';
 
-const testName = clc.black.bgWhite('/register Endpoint - registration file');
+const testName = `${colors.bgGreen('/register Endpoint - registration file')}`;
 
 describe(testName, function () {
   // POST Requests
   describe('POST', function () {
     context('Valid Tests', function () {
       before(async function () {
-        response = await request(state.site).post('/api/register').send(userData.goodRegister);
+        response = await request.post('/api/register').send(data.goodRegister);
       });
       it('Status Code is 200', function () {
         expect(response.status).to.eql(200);
@@ -29,7 +28,7 @@ describe(testName, function () {
     });
     context('Invalid Tests', function () {
       before(async function () {
-        response = await request(state.site).post('/api/register').send(userData.badRegister);
+        response = await request.post('/api/register').send(data.badRegister);
       });
       it('Status Code is 400', function () {
         expect(response.status).to.eql(400);

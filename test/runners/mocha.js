@@ -1,12 +1,7 @@
-// Contains the mocha runner
 const Mocha = require('mocha');
+const path = require('path');
 
-// Helps decide which reporter to use
-// true for web, false for general
-let whichReporter = false;
-
-// Mocha config for running terminal tests
-const generalReporter = new Mocha({
+const cliRunner = new Mocha({
   exit: true,
   parallel: false,
   jobs: 1,
@@ -15,8 +10,7 @@ const generalReporter = new Mocha({
   spec: 'test/*.test.js',
 });
 
-// Mocha config for generating HTML report via mochawesome
-const webReporter = new Mocha({
+const webRunner = new Mocha({
   reporter: 'mochawesome',
   spec: 'test/*.test.js',
   reporterOptions: {
@@ -28,38 +22,32 @@ const webReporter = new Mocha({
   },
 });
 
-function switchReporter(value) {
-  whichReporter = value;
-}
-
-function addFileList(fileArray) {
-  fileArray.forEach(function (file) {
-    if (whichReporter) {
-      webReporter.addFile(file);
+// runnerType is boolean - true for webRunner, false for cliRunner
+function addFileToReporter(runnerBool, fileArray, suitePath) {
+  fileArray.forEach((file) => {
+    if (!runnerBool) {
+      cliRunner.addFile(path.join(suitePath, file));
     } else {
-      generalReporter.addFile(file);
+      webRunner.addFile(path.join(suitePath, file));
     }
   });
 }
 
-function runMocha() {
-  if (whichReporter) {
-    webReporter.run(function (fails) {
-      // Set Exit Code 1 for failure, 0 for success
+function executeFiles(runnerBool) {
+  if (!runnerBool) {
+    cliRunner.run(function (fails) {
       process.exitCode = fails ? 1 : 0;
-      throw new Error('runMocha webReporter.run function failed');
+      throw new Error('cliRunner failed execution!');
     });
   } else {
-    generalReporter.run(function (fails) {
-      // Set Exit Code 1 for failure, 0 for success
+    webRunner.run(function (fails) {
       process.exitCode = fails ? 1 : 0;
-      throw new Error('runMocha generalReporter.run function failed');
+      throw new Error('webRunner failed execution!');
     });
   }
 }
 
 module.exports = {
-  switchReporter,
-  addFileList,
-  runMocha,
+  addFileToReporter,
+  executeFiles,
 };
