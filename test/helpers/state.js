@@ -125,37 +125,28 @@ const State = function () {
   };
 
   this.saveTemplate = function () {
-    // Create a new deep copy
-    const newThis = JSON.parse(JSON.stringify(this));
-    // Delete *commandsUsed
-    delete newThis.argsCommandsUsed;
-    delete newThis.tempCommandsUsed;
-    // Delete all methods
-    const allMethodsList = Object.getOwnPropertyNames(newThis).filter((item) => typeof newThis[item] === 'function');
-    allMethodsList.forEach((item) => {
-      delete newThis[item];
-    });
-    // Delete command list
-    delete newThis.validCommList;
-    // Delete all valid suite lists
-    delete newThis.fullSuiteList;
-    delete newThis.namedSuiteList;
-
-    const savedTemp = {
+    const temp = {
       commands: {},
     };
-    Object.keys(newThis).forEach((item) => {
-      if (item.localeCompare('currentsuitelist') !== 0) {
-        if (item.localeCompare('excludefiles') === 0) {
-          savedTemp.commands[item] = newThis[item].valid;
-        } else {
-          savedTemp.commands[item] = newThis[item];
-        }
-      } else {
-        savedTemp[item] = newThis[item];
+    const unneededProps = [
+      'argsCommandsUsed',
+      'tempCommandsUsed',
+      'templatename',
+      'validCommList',
+      'fullSuiteList',
+      'namedSuiteList',
+    ];
+    const nonMethodProps = Object.getOwnPropertyNames(this).filter((item) => typeof this[item] !== 'function');
+    nonMethodProps.forEach((item) => {
+      if (item.localeCompare('excludefiles') === 0) {
+        temp.commands[item] = this[item].valid;
+      } else if (item.localeCompare('currentSuiteList') === 0) {
+        temp[item] = this[item];
+      } else if (!unneededProps.includes(item)) {
+        temp.commands[item] = this[item];
       }
     });
-    writeFile(savedTemp, newThis.templatedir, newThis.templatename);
+    writeFile(temp, temp.commands.templatedir, this.templatename);
   };
 
   // Method to setup state

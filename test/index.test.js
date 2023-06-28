@@ -23,14 +23,12 @@ if (stateProxy.argsCommandsUsed.valid.includes('help')) {
 } else if (stateProxy.argsCommandsUsed.valid.includes('list')) {
   stateProxy.showList();
   process.exit(0);
-} else if (stateProxy.argsCommandsUsed.valid.includes('templatename')) {
-  if (stateProxy.argsCommandsUsed.valid.includes('savetemplate')) {
+} else if (stateProxy.argsCommandsUsed.valid.includes('savetemplate')) {
     stateProxy.saveTemplate();
-  } else {
+} else if (stateProxy.argsCommandsUsed.valid.includes('templatename')) {
     stateProxy.setupTemplate();
-  }
 } else {
   // Execute stateProxy.currentsuitelist array here
 }
 
-console.dir(stateProxy);
+//console.dir(stateProxy);
