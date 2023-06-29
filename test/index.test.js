@@ -19,12 +19,15 @@ const cliArgs = process.argv.map((item) => item.toLowerCase());
 stateProxy.setupState(cliArgs);
 
 // Check commands in order
-// help -> list -> savetemplate -> templatename -> suite name(s)
+// help -> list -> display -> savetemplate -> templatename -> suite name(s)
 if (stateProxy.argsCommandsUsed.valid.includes('help')) {
   stateProxy.showHelp();
   process.exit(0);
 } else if (stateProxy.argsCommandsUsed.valid.includes('list')) {
   stateProxy.showList();
+  process.exit(0);
+} else if (stateProxy.argsCommandsUsed.valid.includes('display')) {
+  stateProxy.displayDef();
   process.exit(0);
 } else if (stateProxy.argsCommandsUsed.valid.includes('templatename')) {
   stateProxy.setupTemplate();
@@ -58,7 +61,8 @@ if (stateProxy.currentsuitelist.length !== 0) {
   || stateProxy.tempCommandsUsed.valid.includes('report')) {
     runnerObj.report = true;
   }
-  //console.dir(runnerObj);
+  //console.log(stateProxy.suitedir);
+  console.dir(runnerObj);
   runners.addFiles(runnerObj);
   runners.executeRunner(runnerObj.report, runnerObj.runner);
 } else {

@@ -16,6 +16,7 @@
       ["env", "Sets the environment to use", "test"],
       ["site", "Sets the new site to use for the specified environment"],
       ["token", "Set the Authorization Token to use for this run"],
+      ["display", "Displays the values of argument upon reading defaults file except commands", "env"],
       ["excludefiles", "Removes the specified files from the available test suite list for this run"],
       ["runner", "Sets which test runner to execute", "mocha"],
       ["templatename", "Sets the name of the template to use"],

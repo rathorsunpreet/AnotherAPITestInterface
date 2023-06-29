@@ -1,7 +1,7 @@
 // Exports the various _constants.js file based on NODE_ENV
 const { stateProxy } = require('../helpers/state');
 
-const envList = stateProxy.displayDef('env');
+const envList = stateProxy.getDef('env');
 // Fallthrough on test allows default to use test
 switch (stateProxy.env) {
   case envList[0]: module.exports = require('./prod');

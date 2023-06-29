@@ -178,6 +178,14 @@ function writeFile(obj, location, name) {
   }
 }
 
+function getOtherProps() {
+  if (defData !== '') {
+    const offList = Object.keys(defData).filter((item) => item.localeCompare('commands') !== 0);
+    return offList;
+  }
+  return defData;
+}
+
 module.exports = {
   loadTemplate,
   loadDefaults,
@@ -190,4 +198,5 @@ module.exports = {
   getDefValue,
   getCommDesc,
   writeFile,
+  getOtherProps,
 };

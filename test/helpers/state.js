@@ -16,6 +16,7 @@ const {
   getCommWithoutValue,
   getCommDesc,
   writeFile,
+  getOtherProps,
 } = require('./loader');
 const {
   getKey,
@@ -36,6 +37,8 @@ const sitesObj = getSites();
 const envList = getEnv();
 const runnerList = getRunner();
 const commWithoutValue = getCommWithoutValue();
+const displayDefValues = getOtherProps();
+const libPath = './test/helpers/libs.js';
 
 if (propList === '') {
   console.error(`defaults.json was not read at '${defComm[2]}'!`);
@@ -82,13 +85,35 @@ const State = function () {
   });
 
   // Method to display default.json's values for env, runner and site
-  this.displayDef = function (param) {
-    switch (param) {
-      case 'env': return envList;
-      case 'runner': return runnerList;
-      case 'sites': return sitesObj;
-      default: throw new Error('No parameters provided!');
+  this.displayDef = function () {
+    switch (this.display) {
+      case displayDefValues[0]:
+        console.log('The available environments are: ');
+        console.log(envList);
+        break;
+      case displayDefValues[1]:
+        console.log('The available runners are: ');
+        console.log(runnerList);
+        break;
+      case displayDefValues[2]:
+        console.log('The available sites (env:site) are: ');
+        console.dir(sitesObj);
+        break;
+      default: throw new Error('No valid parameters provided!');
     }
+  };
+
+  // Method to get non-command object values from defaults.json
+  this.getDef = function (param) {
+    if (displayDefValues.includes(param)) {
+      switch (param) {
+        case displayDefValues[0]: return envList;
+        case displayDefValues[1]: return runnerList;
+        case displayDefValues[2]: return sitesObj;
+        default: throw new Error('No valid parameters provided!');
+      }
+    }
+    return '';
   };
 
   // Method to display all available suites, also includes the keyword 'all'
@@ -117,11 +142,15 @@ const State = function () {
     console.log(`Use the word "${colors.red.bold('all')}" to execute all test suites.`);
     console.log('');
     console.log(`Mocha Test suites/cases need to be put into "${colors.red.bold(this.suitedir)}" for the system to detect them.`);
-    console.log(`If site needs to be updated, then change it in "${colors.red.bold('./test/helpers/libs.js')}".`);
+    console.log(`If site needs to be updated, then change it in "${colors.red.bold(libPath)}".`);
     console.log('Only javascript files are detected.');
     console.log('');
     console.log('The following commands are available: ');
     console.log(columns);
+    console.log('');
+    console.log(`${colors.yellow.bold('Notes')}:`);
+    console.log('1. Command-line arguments take precedence over the same commands provided by a template.');
+    console.log(`2. Command ${colors.yellow('templatename')} could be used without a value and the system will make one.`);
   };
 
   this.saveTemplate = function () {
@@ -132,6 +161,7 @@ const State = function () {
       'argsCommandsUsed',
       'tempCommandsUsed',
       'templatename',
+      'display',
       'validCommList',
       'fullSuiteList',
       'namedSuiteList',
@@ -334,6 +364,10 @@ const handler = {
       if (runnerList.includes(value)) {
         // Update suitedir if runner is valid
         target.suitedir = path.join(target.suitedir, '../', value, '/');
+        return Reflect.set(target, prop, value);
+      }
+    } else if (prop.localeCompare('display') === 0) {
+      if (displayDefValues.includes(value)) {
         return Reflect.set(target, prop, value);
       }
     } else if (Object.prototype.hasOwnProperty.call(target, prop)) {
