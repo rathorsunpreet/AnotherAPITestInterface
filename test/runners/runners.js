@@ -1,5 +1,5 @@
-const mochaHandler = require('./mocha');
-const tapHandler = require('./tap');
+const mochaHandler = require('./mochaHandler');
+const tapHandler = require('./tapHandler');
 
 function addFiles(runnerObj) {
   switch (runnerObj.runner) {
