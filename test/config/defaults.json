@@ -6,7 +6,7 @@
   ],
   "runner": [
     "mocha",
-    "node"
+    "tap"
   ],
   "commands": {
     // Format for each command:

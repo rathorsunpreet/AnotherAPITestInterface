@@ -53,7 +53,7 @@ if (stateProxy.currentsuitelist.length !== 0) {
   // Execute stateProxy.currentsuitelist array here
   const runnerObj = {
     runner: stateProxy.runner,
-    suiteList: stateProxy.currentsuitelist,
+    suiteList: stateProxy.getFullSuite(),
     suitePath: stateProxy.suitedir,
     report: false,
   };

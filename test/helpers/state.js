@@ -84,6 +84,11 @@ const State = function () {
     this.namedSuiteList.push(path.parse(item).name);
   });
 
+  // Method to get full file name including the extension
+  this.getFullSuite = function () {
+    return this.currentsuitelist.map((item) => ''.concat(item, '.js'));
+  }
+
   // Method to display default.json's values for env, runner and site
   this.displayDef = function () {
     switch (this.display) {
