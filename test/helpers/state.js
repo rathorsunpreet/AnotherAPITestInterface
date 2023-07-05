@@ -38,7 +38,6 @@ const envList = getEnv();
 const runnerList = getRunner();
 const commWithoutValue = getCommWithoutValue();
 const displayDefValues = getOtherProps();
-const libPath = './test/helpers/libs.js';
 
 if (propList === '') {
   console.error(`defaults.json was not read at '${defComm[2]}'!`);
@@ -147,7 +146,7 @@ const State = function () {
     console.log(`Use the word "${colors.red.bold('all')}" to execute all test suites.`);
     console.log('');
     console.log(`Mocha Test suites/cases need to be put into "${colors.red.bold(this.suitedir)}" for the system to detect them.`);
-    console.log(`If site needs to be updated, then change it in "${colors.red.bold(libPath)}".`);
+    console.log(`If site needs to be updated, then change it in "${colors.red.bold(defComm[2])}".`);
     console.log('Only javascript files are detected.');
     console.log('');
     console.log('The following commands are available: ');
