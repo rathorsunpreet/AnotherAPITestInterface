@@ -62,7 +62,7 @@ if (stateProxy.currentsuitelist.length !== 0) {
     runnerObj.report = true;
   }
   //console.log(stateProxy.suitedir);
-  console.dir(runnerObj);
+  //console.dir(runnerObj);
   runners.addFiles(runnerObj);
   runners.executeRunner(runnerObj.report, runnerObj.runner);
 } else {

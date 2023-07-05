@@ -5,8 +5,7 @@
     "test"
   ],
   "runner": [
-    "mocha",
-    "tap"
+    "mocha"
   ],
   "commands": {
     // Format for each command:
