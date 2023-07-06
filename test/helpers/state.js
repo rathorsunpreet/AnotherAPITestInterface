@@ -180,6 +180,10 @@ const State = function () {
         temp.commands[item] = this[item];
       }
     });
+    // Check if templatename has no extension
+    if (path.extname(this.templatename) === '') {
+      this.templatename = ''.concat(this.templatename, '.json');
+    }
     writeFile(temp, temp.commands.templatedir, this.templatename);
   };
 

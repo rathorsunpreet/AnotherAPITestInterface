@@ -1,0 +1,21 @@
+{
+  "commands": {
+    "env": "dev",
+    "site": "https://reqres.in",
+    "token": "",
+    "excludefiles": [
+      "game",
+      "registration"
+    ],
+    "runner": "mocha",
+    "templatedir": "./test/templates/",
+    "suitedir": "./test/suites/mocha/",
+    "datafile": "./test/data/data.js",
+    "currentsuitelist": [
+      "login",
+      "single",
+      "users",
+      "multiple"
+    ]
+  }
+}

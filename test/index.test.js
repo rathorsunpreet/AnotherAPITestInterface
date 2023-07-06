@@ -29,7 +29,8 @@ if (stateProxy.argsCommandsUsed.valid.includes('help')) {
 } else if (stateProxy.argsCommandsUsed.valid.includes('display')) {
   stateProxy.displayDef();
   process.exit(0);
-} else if (stateProxy.argsCommandsUsed.valid.includes('templatename')) {
+} else if (stateProxy.argsCommandsUsed.valid.includes('templatename')
+  && !stateProxy.argsCommandsUsed.valid.includes('savetemplate')) {
   stateProxy.setupTemplate();
 } else if (stateProxy.argsCommandsUsed.valid.includes('savetemplate')) {
   stateProxy.saveTemplate();
