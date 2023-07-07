@@ -130,6 +130,8 @@ const State = function () {
   // Help message
   this.showHelp = function () {
     const cdPair = getCommDesc();
+    // Add compound commands
+    cdPair['env=site'] = 'Compound command which executes "env" and "site" in consecutive order';
     const columns = columinfy(cdPair, { showHeaders: false });
     console.log(figlet.textSync('Another API Test Interface', {
       font: 'Cybermedium',

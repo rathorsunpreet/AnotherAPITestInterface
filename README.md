@@ -43,7 +43,7 @@ The project allows for the following commands to be used:
 - list - Display the list of valid test suite(s) or case(s)
 - report - Generate a HTML Report upon execution of test suite(s) or case(s)
 - savetemplate - Save the current arguments in a JSON template
-- env=site - Compund command which excutes 'env' and 'site' commands together
+- env=site - Compound command which executes 'env' and 'site' in consecutive order
 
 The keyword 'all' can be used to signal the inclusion of all test suite(s) / case(s). 'all' is considered invalid when used with 'excludefiles' command.
  
