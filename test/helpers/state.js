@@ -124,6 +124,7 @@ const State = function () {
   this.showList = function () {
     const newList = [...this.namedSuiteList];
     newList.push('all');
+    console.log('The available test case(s) / suite(s) are: ');
     console.log(newList);
   };
 
@@ -293,7 +294,7 @@ const State = function () {
           // Iterate over tempData.commands block
           // If valid commands then perform necessary operations
           Object.keys(tempData.commands).forEach((item) => {
-            const kvPair = ''.concat(item, '=', tempData.commands[item]);
+            //const kvPair = ''.concat(item, '=', tempData.commands[item]);
             // console.log(kvPair + ':' + !this.argsCommandsUsed.valid.includes(item));
             if (!this.argsCommandsUsed.valid.includes(item)) {
               if (propList.includes(item)) {
@@ -330,26 +331,27 @@ const State = function () {
                   this.tempCommandsUsed.valid.push('site');
                 }
               } else {
-                this.tempCommandsUsed.invalid.push(kvPair);
+                this.tempCommandsUsed.invalid.push(item);
               }
             }
           });
-        } else if (id.localeCompare('currentsuitelist') === 0
-            && tempData.currentsuitelist.length !== 0) {
+        } else if (id.localeCompare('currentsuitelist') === 0) {
           if (!this.tempCommandsUsed.valid.includes('currentsuitelist')
             && !this.argsCommandsUsed.valid.includes('currentsuitelist')) {
             this.tempCommandsUsed.valid.push('currentsuitelist');
-            tempData.currentsuitelist.forEach((item) => {
-              if (item.localeCompare('all') === 0) {
-                this.currentsuitelist = [...this.namedSuiteList];
-              } else if (this.namedSuiteList.includes(item) && !this.currentsuitelist.includes(item)) {
-                this.currentsuitelist.push(item);
-              }
-            });
+            if (tempData.currentsuitelist.length !== 0) {
+              tempData.currentsuitelist.forEach((item) => {
+                if (item.localeCompare('all') === 0) {
+                  this.currentsuitelist = [...this.namedSuiteList];
+                } else if (this.namedSuiteList.includes(item) && !this.currentsuitelist.includes(item)) {
+                  this.currentsuitelist.push(item);
+                }
+              });
+            }
           }
         } else {
-          const kv = ''.concat(id, '=', tempData[id]);
-          this.tempCommandsUsed.invalid.push(kv);
+          //const kv = ''.concat(id, '=', tempData[id]);
+          this.tempCommandsUsed.invalid.push(id);
         }
       });
       // Remove suites mentioned in excludefiles.valid from currentsuitelist

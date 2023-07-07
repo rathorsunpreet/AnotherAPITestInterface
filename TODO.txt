@@ -1,1 +1,1 @@
-Schema for templates is invalid, everything is encompassed within commands object. Needs to be commands object and then currentsuitelist array.
+loading template test_1688691446, prints currentsuitelist as invalid item

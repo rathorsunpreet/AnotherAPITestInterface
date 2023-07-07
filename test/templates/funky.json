@@ -1,23 +1,19 @@
 {
   "commands": {
-    "env": "prod",
+    "env": "dev",
     "site": "https://reqres.in",
-    "token": "",
-    "excludefiles": {
-      "valid": [
-        "resources",
-        "users"
-      ],
-      "invalid": []
-    },
+    "token": "asbcgdgjasd29euiwfoeih98ry",
+    "excludefiles": [
+      "multiple"
+    ],
     "runner": "mocha",
-    "templatename": "funky.json",
-    "templatedir": "/test/templates/",
-    "testdir": "/test/cases/mocha/",
-    "datafile": "/test/user_data/user_data.js",
-    "defaults": "/test/config/defaults.json"
+    "templatedir": "./test/templates/",
+    "suitedir": "./test/suites/mocha/",
+    "datafile": "./test/data/data.js"
   },
-  "files": [
-    "all"
+  "currentsuitelist": [
+    "users",
+    "login",
+    "registration"
   ]
 }
