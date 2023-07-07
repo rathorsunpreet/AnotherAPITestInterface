@@ -5,7 +5,6 @@
     "token": "",
     "excludefiles": [],
     "runner": "mocha",
-    "templatename": "",
     "templatedir": "./test/templates/",
     "suitedir": "./test/suites/mocha/",
     "datafile": "./test/data/data.js"

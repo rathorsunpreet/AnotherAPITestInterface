@@ -52,5 +52,9 @@
         "type": "string"
       }
     }
-  }
+  },
+  "required": [
+    "commands",
+    "currentsuitelist"
+  ]
 }

@@ -162,6 +162,7 @@ const State = function () {
   this.saveTemplate = function () {
     const temp = {
       commands: {},
+      currentsuitelist: [],
     };
     const unneededProps = [
       'argsCommandsUsed',
@@ -170,20 +171,21 @@ const State = function () {
       'display',
       'validCommList',
       'fullSuiteList',
-      'namedSuiteList',
+      'namedSuiteList'
     ];
     const nonMethodProps = Object.getOwnPropertyNames(this).filter((item) => typeof this[item] !== 'function');
     nonMethodProps.forEach((item) => {
       if (item.localeCompare('excludefiles') === 0) {
         temp.commands[item] = this[item].valid;
-      } else if (item.localeCompare('currentSuiteList') === 0) {
-        temp[item] = this[item];
+      } else if (item.localeCompare('currentsuitelist') === 0) {
+        temp.currentsuitelist = this[item];
       } else if (!unneededProps.includes(item)) {
         temp.commands[item] = this[item];
       }
     });
     // Check if templatename has no extension
-    if (path.extname(this.templatename) === '') {
+    if (path.extname(this.templatename) === ''
+      && this.templatename !== '') {
       this.templatename = ''.concat(this.templatename, '.json');
     }
     writeFile(temp, temp.commands.templatedir, this.templatename);
@@ -391,4 +393,5 @@ const stateProxy = new Proxy(stateObj, handler);
 
 module.exports = {
   stateProxy,
+  stateObj,
 };

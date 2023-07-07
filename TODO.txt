@@ -1,0 +1,1 @@
+Schema for templates is invalid, everything is encompassed within commands object. Needs to be commands object and then currentsuitelist array.
