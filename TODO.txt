@@ -1,1 +1,6 @@
-loading template test_1688691446, prints currentsuitelist as invalid item
+Add the following commands:
+1. chart - runs report in background and then either appends or writes to JSONdb file which is then used to create a chart
+2. charttype=line - specify which chart type to create
+3. memory=on - switch to use, default is off. This sets whether append or over-write action on JSONdb needs to take place
+
+For charts use billboard.js / charts.js . These two are ES Modules, use dynamic import with them.
